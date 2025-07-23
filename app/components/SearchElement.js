@@ -59,7 +59,7 @@ const SearchElement = () => {
     <div className="w-full max-w-2xl mx-auto">
       {/* Search Input */}
       <div className="relative flex items-center mb-6">
-        <div className="absolute left-4 text-gray-400">
+        <div className="absolute left-4 text-orange-400">
           <FaSearch />
         </div>
         <input
@@ -91,7 +91,7 @@ const SearchElement = () => {
           >
             {/* Loading Skeleton */}
             {isLoading && (
-              <div className="space-y-3 p-4">
+              <div className="space-y-3 p-4 h-[25vh]" >
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
@@ -114,7 +114,7 @@ const SearchElement = () => {
                 <div
                   ref={resultsRef}
                   onScroll={handleScroll}
-                  className="max-h-[60vh] overflow-y-auto p-2"
+                  className="max-h-[20vh] overflow-y-auto p-2"
                 >
                   <div className="space-y-2">
                     {results.map((item) => (

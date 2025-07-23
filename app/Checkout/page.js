@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import useCartStore from '../store/cartStore';
 import Footer from '../components/footer';
+import Navbar from '../components/navbar';
 
 const CheckoutPage = () => {
   const { user } = useContext(UserContext);
