@@ -17,7 +17,7 @@ const SearchResultsPage = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Results for "{query}"</h1>
+      <h1 className="text-2xl font-bold mb-4">{`Results for "${query}"`}</h1>
       {results.length === 0 ? (
         <p>No results found.</p>
       ) : (

@@ -182,7 +182,7 @@ const SearchElement = () => {
             {!isLoading && hasSearched && results.length === 0 && (
               <div className="p-6 text-center">
                 <p className="text-gray-500 dark:text-gray-400">
-                  No results found for <span className="font-medium">"{searchTerm}"</span>
+                  No results found for <span className="font-medium">{`"${searchTerm}"`}</span>
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
                   Try different keywords or check spelling
