@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import React from 'react'
 import ItemPage from '../page/ItemPage'
 import Navbar from '@/app/components/navbar';
