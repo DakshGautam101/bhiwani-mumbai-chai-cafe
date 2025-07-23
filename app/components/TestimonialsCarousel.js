@@ -126,7 +126,7 @@ const TestimonialsCarousel = () => {
                   </div>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                  "{review.review}"
+                  &ldquo;{review.review}&rdquo;
                 </p>
               </div>
             </SwiperSlide>
