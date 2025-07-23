@@ -147,7 +147,7 @@ const AdminPage = () => {
                 </Button>
               </div>
             
-              <PreviewSection url="http://localhost:3000" />
+              <PreviewSection url="https://bhiwani-mumbai-chai-cafe.vercel.app/" />
             </section>
           </div>
         </div>

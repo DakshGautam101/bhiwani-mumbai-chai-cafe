@@ -7,7 +7,7 @@ const requestOptions = {
 
 export const getCategories = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/menu/GetCategories", requestOptions);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/menu/GetCategories`, requestOptions);
     if (!response.ok) throw new Error("Failed to fetch categories");
 
     const categories = await response.json();
