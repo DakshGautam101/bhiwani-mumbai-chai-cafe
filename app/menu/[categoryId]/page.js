@@ -66,6 +66,9 @@ async function getCategoryData(categoryId) {
   }
 }
 
+console.log('Rendering page with data:', { categoryId, hasCategory: !!data.category, itemsCount: data.items.length });
+
+
 export default async function CategoryPage({ params }) {
   const { categoryId } = await params;
   const data = await getCategoryData(categoryId);

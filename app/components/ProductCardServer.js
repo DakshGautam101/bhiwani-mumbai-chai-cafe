@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation';
 
 async function getCategoryById(id) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/menu/GetCategories/${id}`, { cache: 'no-store' });
+    const base_url = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000/api';
+    const res = await fetch(`${base_url}/menu/GetCategories/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch (error) {

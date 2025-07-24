@@ -7,7 +7,9 @@ const requestOptions = {
 
 export const getCategories = async () => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/menu/GetCategories`, requestOptions);
+    const base_url = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000/api';
+
+    const response = await fetch(`${base_url}/menu/GetCategories`, requestOptions);
     if (!response.ok) throw new Error("Failed to fetch categories");
 
     const categories = await response.json();
@@ -30,7 +32,8 @@ export const getCategories = async () => {
 
 export const getMenuItems = async () => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/menu/GetItems`, requestOptions);
+    const base_url = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000/api';
+    const response = await fetch(`${base_url}/menu/GetItems`, requestOptions);
     if (!response.ok) throw new Error("Failed to fetch items");
     return await response.json();
   } catch (error) {
