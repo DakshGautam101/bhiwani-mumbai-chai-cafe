@@ -9,14 +9,16 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 import Image from 'next/image';
+
 export default async function Page({ params }) {
-  const slug = params?.slug;
+  const { slug } = await params;
 
   // Ensure the slug is defined
   if (!slug) {
     notFound();
     return;
   }
+  
   // Construct the file path based on the slug
   const filePath = `content/${slug}.md`;
 
