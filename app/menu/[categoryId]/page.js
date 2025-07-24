@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import { notFound } from 'next/navigation';
-import CategoryPageClient from '@/app/components/CategoryPageClient';
+import CategoryClientPage from './CategoryClientPage';
 
 async function getCategoryData(categoryId) {
   if (!categoryId) {
@@ -11,8 +11,10 @@ async function getCategoryData(categoryId) {
   }
 
   try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    
     // First API call - Get Category
-    const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/menu/GetCategories/${categoryId}`, {
+    const categoryRes = await fetch(`${baseUrl}/api/menu/GetCategories/${categoryId}`, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json'
@@ -28,7 +30,7 @@ async function getCategoryData(categoryId) {
     const category = await categoryRes.json();
 
     // Second API call - Get Items
-    const itemsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/menu/GetCategoryItems?categoryId=${categoryId}`, {
+    const itemsRes = await fetch(`${baseUrl}/api/menu/GetCategoryItems?categoryId=${categoryId}`, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json'
@@ -65,7 +67,8 @@ async function getCategoryData(categoryId) {
 }
 
 export default async function CategoryPage({ params }) {
-  const data = await getCategoryData(params.categoryId);
+  const { categoryId } = await params;
+  const data = await getCategoryData(categoryId);
 
   if (!data?.category) {
     console.error('No category data found');
@@ -74,13 +77,13 @@ export default async function CategoryPage({ params }) {
 
   // Debug logging
   console.log('Rendering page with data:', {
-    categoryId: params.categoryId,
+    categoryId,
     hasCategory: !!data.category,
     itemsCount: data.items.length
   });
 
   return (
-    <CategoryPageClient 
+    <CategoryClientPage 
       category={data.category}
       items={data.items}
     />
