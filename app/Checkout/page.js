@@ -366,10 +366,6 @@ const CheckoutPage = () => {
                 <span>Total:</span>
                 <span>₹{total.toFixed(2)}</span>
               </div>
-
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                Place Order →
-              </Button>
               <p className="text-xs text-gray-400 text-center mt-2">
                 By confirming the order, I accept the{' '}
                 <span className="underline cursor-pointer">terms of the user agreement</span>.
