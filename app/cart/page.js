@@ -247,10 +247,9 @@ const CartPage = () => {
                   <Button
                     className="w-full bg-orange-500 hover:bg-orange-600"
                     disabled={groupedCart.length === 0}
-
                   >
                     <Link href="/Checkout">
-                    Proceed to Checkout
+                      Proceed to Checkout
                     </Link>
                   </Button>
 
