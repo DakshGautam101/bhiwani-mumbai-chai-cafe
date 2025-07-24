@@ -47,7 +47,7 @@ const Page = async ({ params }) => {
         <Navbar/>
         <div className="container mx-auto py-8 text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Product Not Found</h1>
-          <p className="text-gray-600">The product you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The product you &apos;re looking for doesn&apos;t exist.</p>
         </div>
         <Footer/>
       </>

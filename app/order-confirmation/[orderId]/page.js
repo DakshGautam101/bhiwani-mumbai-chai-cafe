@@ -79,7 +79,7 @@ const OrderConfirmationPage = () => {
         <div className="min-h-screen bg-gray-100 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-600 mb-4">Order Not Found</h1>
-            <p className="text-gray-500 mb-4">The order you're looking for doesn't exist.</p>
+            <p className="text-gray-500 mb-4">The order you &apos;re looking for doesn&apos;t exist.</p>
             <Link href="/">
               <Button className="bg-orange-500 hover:bg-orange-600">Go Home</Button>
             </Link>
@@ -121,7 +121,7 @@ const OrderConfirmationPage = () => {
           <div className="bg-white rounded-xl shadow-md p-8 mb-8 text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Order Confirmed!</h1>
-            <p className="text-gray-600 mb-4">Thank you for your order. We'll prepare it with care.</p>
+            <p className="text-gray-600 mb-4">Thank you for your order. We&apos;ll prepare it with care.</p>
             <div className="bg-gray-50 rounded-lg p-4 inline-block">
               <p className="text-sm text-gray-500">Order ID</p>
               <p className="text-xl font-mono font-bold text-gray-800">{order.orderId}</p>
