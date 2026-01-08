@@ -25,6 +25,7 @@ export async function POST(request) {
             user.role = 'admin'; 
         }
         const token = jwt.sign({id: user._id , email : user.email}, process.env.JWT_SECRET, {expiresIn: "1h"});
+        console.log("User logged in successfully:", token,user.email);
         return NextResponse.json({ message: "Login successful", user, token }, { status: 200 });
         
     } catch (error) {

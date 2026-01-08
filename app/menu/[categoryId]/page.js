@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import React from 'react';
 import { notFound } from 'next/navigation';
 import CategoryClientPage from './CategoryClientPage';
@@ -11,54 +9,43 @@ async function getCategoryData(categoryId) {
   }
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    
-    // First API call - Get Category
-    const categoryRes = await fetch(`${baseUrl}/api/menu/GetCategories/${categoryId}`, {
+    // Get Category
+    const categoryRes = await fetch(`http://localhost:3000/api/menu/GetCategories/${categoryId}`, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      next: { revalidate: 0 }
     });
 
     if (!categoryRes.ok) {
-      const errorText = await categoryRes.text();
-      console.error('Category API Error:', errorText);
+      console.error(`Category API Error: ${categoryRes.status}`);
       return null;
     }
 
     const category = await categoryRes.json();
 
-    // Second API call - Get Items
-    const itemsRes = await fetch(`${baseUrl}/api/menu/GetCategoryItems?categoryId=${categoryId}`, {
+    // Get Category Items
+    const itemsRes = await fetch(`http://localhost:3000/api/menu/GetCategoryItems?categoryId=${categoryId}`, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      next: { revalidate: 0 }
     });
 
     if (!itemsRes.ok) {
-      const errorText = await itemsRes.text();
-      console.error('Items API Error:', errorText);
+      console.error(`Items API Error: ${itemsRes.status}`);
       return { category, items: [] };
     }
 
     const items = await itemsRes.json();
-
-    // Validate items structure
-    if (!Array.isArray(items)) {
-      console.error('Invalid items response format:', items);
-      return { category, items: [] };
-    }
-
+    
     // Debug logging
-    console.log('API Response Data:', {
-      category: category.name,
-      itemsCount: items.length,
-      itemNames: items.map(i => i.name)
+    console.log('Category Data:', {
+      categoryId,
+      categoryName: category.name,
+      itemsCount: items.length
     });
 
-    return { category, items };
+    return {
+      category,
+      items: Array.isArray(items) ? items : []
+    };
 
   } catch (error) {
     console.error('Failed to fetch category data:', error);
@@ -66,29 +53,25 @@ async function getCategoryData(categoryId) {
   }
 }
 
-console.log('Rendering page with data:', { categoryId, hasCategory: !!data.category, itemsCount: data.items.length });
-
-
 export default async function CategoryPage({ params }) {
-  const { categoryId } = await params;
-  const data = await getCategoryData(categoryId);
+  try {
+    const data = await getCategoryData(params.categoryId);
 
-  if (!data?.category) {
-    console.error('No category data found');
+    if (!data?.category) {
+      console.error('No category found for ID:', params.categoryId);
+      notFound();
+    }
+
+    return (
+      <CategoryClientPage 
+        category={data.category}
+        items={data.items}
+      />
+    );
+  } catch (error) {
+    console.error('Error in CategoryPage:', error);
     notFound();
   }
-
-  // Debug logging
-  console.log('Rendering page with data:', {
-    categoryId,
-    hasCategory: !!data.category,
-    itemsCount: data.items.length
-  });
-
-  return (
-    <CategoryClientPage 
-      category={data.category}
-      items={data.items}
-    />
-  );
 }
+
+export const dynamic = 'force-dynamic';

@@ -1,0 +1,40 @@
+Date: 12/10/2025
+Time: 13:24
+Phone Number: +918750017154
+Message: Your order has been shipped! 📦
+--------------------
+Date: 12/10/2025
+Time: 13:25
+Phone Number: +918750017154
+Message: Your order has been confirmed! ✅
+--------------------
+Date: 12/10/2025
+Time: 13:28
+Phone Number: +918750017154
+Message: Your order has been shipped! 📦
+--------------------
+Date: 12/10/2025
+Time: 14:3
+Phone Number: +918750017154
+Message: Your order has been shipped! 📦
+--------------------
+Date: 4/11/2025
+Time: 13:32
+Phone Number: +918750017154
+Message: Your order has been shipped! 📦
+--------------------
+Date: 4/11/2025
+Time: 13:32
+Phone Number: +918750017154
+Message: Your order has been shipped! 📦
+--------------------
+Date: 14/12/2025
+Time: 18:30
+Phone Number: +918750017154
+Message: Your order has been cancelled. ❌
+--------------------
+Date: 14/12/2025
+Time: 18:46
+Phone Number: +918750017154
+Message: Dear Daksh Gautam,This message is from Bhiwani Mumbai Chai Cafe regarding your recent order.We regret to inform you that your order (ID: 689ed3e1f389baf60f7899d8) placed on 15/08/2025 at 11:59:53, for a total of Rs. 137, has been cancelled.Original Order Details:Customer Name: Daksh GautamOrder ID: 689ed3e1f389baf60f7899d8Date: 15/08/2025Time: 11:59:53Total Amount: Rs. 137Delivery Address: <DELIVERY_ADDRESS>City: <CITY>We apologize for any inconvenience this may cause.Thank you for your understanding. For any queries, please contact us at +91-8750017154.Sincerely,Bhiwani Mumbai Chai Cafe
+--------------------

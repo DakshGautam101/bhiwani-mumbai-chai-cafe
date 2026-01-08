@@ -1,10 +1,10 @@
 'use client'
-// import Navbar from '@/app/components/navbar';
+import Navbar from '@/app/components/navbar';
 import ProfilePage from '../../Pages/ProfilePage'
 export default function Profile() {
   return (
     <>
-    {/* <Navbar/> */}
+    <Navbar/>
       <ProfilePage />
     </>
   );

@@ -1,78 +1,56 @@
+// models/itemModel.js
 import mongoose from "mongoose";
 
-// Review schema
 const reviewSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    userName: {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    userName: { type: String, required: true },
+    userEmail: { type: String, required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    review: { type: String, required: true, trim: true },
+    createdAt: { type: Date, default: Date.now },
+});
+
+const featuredSchema = new mongoose.Schema({
+    heading: {
         type: String,
-        required: true
+        // enum: ["Most Sold", "Best Offer", "Trending Now", "Recommended"],
+        default: "Best Offer",
     },
-    userEmail: {
-        type: String,
-        required: true
-    },
-    rating: {
+    discount: {
         type: Number,
         required: true,
-        min: 1,
-        max: 5
-    },
-    review: {
-        type: String,
-        required: true,
-        trim: true
+        min: 0,
     },
     createdAt: {
         type: Date,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 });
 
 export const itemSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-    },
+    name: { type: String, required: true },
     price: {
         type: Number,
-        required: true,
+        required: true
     },
-    description: {
-        type: String,
-        required: true,
-    },
-    image: {
-        type: String,
-        required: true,
-    },
-    inStock: {
-        type: Boolean,
-        default: true,
-    },
-    images :{
-        type: Array,
-        default: []
-    },
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true,
-    },
-    rating: {
+    originalPrice: {
         type: Number,
-        default: 5.0,
-        min: 0,
-        max: 5
+        default: function() {
+            return this.price;
+        }
     },
+    description: { type: String, required: true },
+    image: { type: String, required: true },
+    inStock: { type: Boolean, default: true },
+    images: { type: Array, default: [] },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
+    rating: { type: Number, default: 5.0, min: 0, max: 5 },
     reviews: [reviewSchema],
-    featuredAt: {
-        type: Array,
-        default: []
+    featured: [featuredSchema], 
+    isFeatured: {
+        type: Boolean,
+        default: false
     }
 });
 
-export const Item = mongoose.models.Item || mongoose.model('Item', itemSchema);
+export const Item = mongoose.models.Item || mongoose.model("Item", itemSchema);

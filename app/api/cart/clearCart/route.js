@@ -12,7 +12,8 @@ export async function POST(request) {
         }
         user.cart = [];
         await user.save();
-        return new Response(JSON.parse("Cart cleared"), { status: 200, headers: { "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ message: "Cart cleared" }), { status: 200, headers: { "Content-Type": "application/json" } });
+
     } catch (error) {
         console.error("Error in clearCart API:", error);
         return new Response(

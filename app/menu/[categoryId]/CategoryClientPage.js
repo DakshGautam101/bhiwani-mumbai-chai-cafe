@@ -17,6 +17,11 @@ import {
   CarouselNext,
 } from '@/components/ui/carousel';
 
+const calculateDiscountedPrice = (originalPrice, discount) => {
+  if (!discount || discount <= 0) return originalPrice;
+  return Math.round(originalPrice * (1 - discount / 100));
+};
+
 const CategoryItemCard = ({ item, user, addToCart, isLoadingGlobal }) => {
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -38,7 +43,7 @@ const CategoryItemCard = ({ item, user, addToCart, isLoadingGlobal }) => {
   };
 
   return (
-    <div className="rounded-xl p-4 shadow border hover:scale-105 transition-transform bg-white dark:bg-neutral-900 flex flex-col gap-3">
+    <div className="rounded-2xl p-4 shadow-md border border-neutral-200 dark:border-neutral-800 hover:scale-[1.03] transition-transform bg-white dark:bg-neutral-900 flex flex-col gap-3">
       {/* Image Carousel */}
       <div className="w-full">
         {allImages.length > 1 ? (
@@ -68,12 +73,30 @@ const CategoryItemCard = ({ item, user, addToCart, isLoadingGlobal }) => {
       </div>
       <h4 className="text-lg font-semibold text-orange-700 dark:text-orange-400 line-clamp-1">{item.name}</h4>
       <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{item.description}</p>
-      <div className="text-orange-600 dark:text-orange-400 font-bold mt-2">₹{item.price?.toFixed(2)}</div>
+      <div className="text-orange-600 dark:text-orange-400 font-bold mt-2">
+        {item.isFeatured && item.featured?.[0] ? (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold text-green-600">
+                ₹{calculateDiscountedPrice(item.price, item.featured[0].discount)}
+              </span>
+              <span className="text-base text-gray-500 line-through">
+                ₹{item.price}
+              </span>
+            </div>
+            <span className="text-sm bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+              {item.featured[0].discount}% off
+            </span>
+          </div>
+        ) : (
+          <span className="text-xl font-bold">₹{item.price}</span>
+        )}
+      </div>
       <div className="flex items-center gap-1 text-yellow-500">
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
-            className={`w-4 h-4 ${i < Math.round(item.rating) ? 'fill-yellow-500' : 'fill-gray-300'}`}
+            className={`w-4 h-4 ${i < Math.round(item.rating) ? 'fill-yellow-500' : 'fill-gray-300 dark:fill-neutral-700'}`}
           />
         ))}
         <span className="text-xs text-gray-700 dark:text-gray-300 ml-1">{item.rating || 'N/A'}</span>
@@ -108,16 +131,23 @@ export default function CategoryClientPage({ category, items }) {
   return (
     <>
       <Navbar />
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl overflow-hidden shadow">
-          <img src={category.image} alt={category.name} className="w-full h-64 object-cover" />
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-orange-600">{category.name}</h1>
-            <p className="text-gray-700 mt-2">{category.description}</p>
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        {/* Portrait Image Card */}
+        <div className="bg-white dark:bg-neutral-900 rounded-xl overflow-hidden shadow-md flex flex-col md:flex-row items-center justify-center p-6">
+          <img
+            src={category.image}
+            alt={category.name}
+            className="w-72 h-96 object-cover rounded-xl shadow-md"
+          />
+          <div className="md:ml-8 mt-4 md:mt-0 text-center md:text-left">
+            <h1 className="text-4xl font-bold text-orange-600 dark:text-orange-400">{category.name}</h1>
+            <p className="text-gray-700 dark:text-gray-300 mt-2 max-w-md">{category.description}</p>
           </div>
         </div>
 
-        <h2 className="text-2xl text-center font-semibold mt-8 mb-4 text-orange-700">Dishes in this Category</h2>
+        <h2 className="text-3xl text-center font-semibold mt-12 mb-6 text-orange-700 dark:text-orange-400">
+          Dishes in this Category
+        </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.length > 0 ? (
@@ -131,7 +161,7 @@ export default function CategoryClientPage({ category, items }) {
               />
             ))
           ) : (
-            <div className="col-span-full text-center text-gray-500 py-10">
+            <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-10">
               No items found in this category.
             </div>
           )}

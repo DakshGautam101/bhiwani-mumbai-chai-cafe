@@ -24,6 +24,22 @@ export default function AdminItemProfilePage() {
   const [uploading, setUploading] = useState(false);
   const imageInputRef = useRef(null);
 
+  // ✅ Fixed: pass token properly
+  const findCategoryById = async (categoryId, token) => {
+    try {
+      const res = await fetch(`/api/admin/category/${categoryId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      return data?.category || null;
+    } catch (err) {
+      console.error('Error fetching category:', err);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -32,13 +48,13 @@ export default function AdminItemProfilePage() {
       return;
     }
 
-    fetch(`/api/admin/item/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchItem = async () => {
+      try {
+        const res = await fetch(`/api/admin/item/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+
         if (data.item) {
           setItem(data.item);
           setFormValues({
@@ -49,12 +65,29 @@ export default function AdminItemProfilePage() {
             image: data.item.image || '',
             available: data.item.available ?? true,
           });
+
+          // ✅ only call after item is loaded
+          if (data.item.category) {
+            const category = await findCategoryById(data.item.category, token);
+            if (category) {
+              setFormValues((prev) => ({
+                ...prev,
+                category: category.name, // show category name
+              }));
+            }
+          }
         } else {
           toast.error(data?.error || 'Item not found');
         }
-      })
-      .catch(() => toast.error('Failed to fetch item'))
-      .finally(() => setLoading(false));
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to fetch item');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItem();
   }, [id, router]);
 
   const handleSave = async () => {
@@ -91,7 +124,6 @@ export default function AdminItemProfilePage() {
     if (!file) return;
 
     setUploading(true);
-
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
@@ -99,10 +131,7 @@ export default function AdminItemProfilePage() {
     try {
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
+        { method: 'POST', body: formData }
       );
       const data = await res.json();
       if (data.secure_url) {

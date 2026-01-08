@@ -29,6 +29,24 @@ const AdminPage = () => {
     }
   };
 
+const fetchOrderCount = async () => {
+    try {
+      const response = await fetch('/admin/api/OrderCount');
+      const data = await response.json();
+      if (data.error) toast.error(data.error);
+      setOrderCount(data.orderCount || 0);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to fetch order count');
+    }
+  };
+
+  const [orderCount, setOrderCount] = useState(0);
+  useEffect(() => {
+    fetchOrderCount();
+  }, []);
+
+
   const fetchMenuItemsCount = async () => {
     try {
       const response = await fetch('/admin/api/ItemsCount');
@@ -50,6 +68,7 @@ const AdminPage = () => {
     setIsLoggingOut(true);
     try {
       localStorage.removeItem('token');
+      localStorage.clear();
       setUser(null);
       toast.success('Logged out successfully');
       router.push('/auth');
@@ -122,7 +141,8 @@ const AdminPage = () => {
 
               <div className="bg-green-100 dark:bg-green-900 p-6 rounded-lg shadow hover:shadow-md transition">
                 <h3 className="text-md font-semibold text-green-800 dark:text-green-200 mb-1">Total Orders</h3>
-                <p className="text-4xl font-bold text-green-600 dark:text-green-300">0</p>
+                <p className="text-4xl font-bold text-green-600 dark:text-green-300">{orderCount}</p>
+
               </div>
 
               <div className="bg-blue-100 dark:bg-blue-900 p-6 rounded-lg shadow hover:shadow-md transition">

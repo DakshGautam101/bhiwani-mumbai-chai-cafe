@@ -7,6 +7,7 @@ import axiosInstance from "@/lib/axios";
 import { AdminContext } from "@/context/AdminContext";
 import { cartContext } from "@/context/CartContext";
 import { itemContext } from "@/context/itemContext";
+import { orderContext } from "@/context/orderContext";
 
 export function ThemeProvider({ children, ...props }) {
   const [user, setUser] = useState(null);
@@ -14,6 +15,7 @@ export function ThemeProvider({ children, ...props }) {
   const [isLoading, setIsLoading] = useState(true);
   const  [cart, setCart] = useState([]);
   const [item, setItem] = useState(null);
+  const [order, setOrder] = useState(null);
   useEffect(() => {
     const initializeUser = async () => {
       const token = localStorage.getItem("token");
@@ -27,7 +29,7 @@ export function ThemeProvider({ children, ...props }) {
             token,
           });
           setAdmin(response.data.user.role === 'admin' ? response.data.user : null);
-          console.log("PROFILE RESPONSE: ", response.data);
+          // console.log("PROFILE RESPONSE: ", response.data);
 
         } catch (error) {
           console.error("Error verifying token:", error);
@@ -46,6 +48,7 @@ export function ThemeProvider({ children, ...props }) {
 
   return (
     <NextThemesProvider {...props}>
+      <orderContext.Provider value={{order, setOrder}}>
       <AdminContext.Provider value={{admin, setAdmin}}>
       <UserContext.Provider value={{ user, setUser, isLoading }}>
         <cartContext.Provider value={{ cart, setCart }}>
@@ -55,6 +58,7 @@ export function ThemeProvider({ children, ...props }) {
         </cartContext.Provider>
       </UserContext.Provider>
         </AdminContext.Provider>
+        </orderContext.Provider>
     </NextThemesProvider>
   );
 }

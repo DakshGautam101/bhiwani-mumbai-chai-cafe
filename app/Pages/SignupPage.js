@@ -12,6 +12,7 @@ import UniversalLoader from '../components/UniversalLoader';
 const SignupPage = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' });
   const [loading, setLoading] = useState(false);
+  const [routeloading, setRouteloading] = useState(false);
   const { setUser } = useContext(UserContext);
   const router = useRouter();
 
@@ -34,9 +35,13 @@ const SignupPage = () => {
       setLoading(false);
     }
   };
+  const handleRouteChange = () => {
+    setRouteloading(true);
+  };
 
   return (
     <>
+      {routeloading && <UniversalLoader />}
       {loading && <UniversalLoader />}
       <Navbar/>
       <div className="flex items-center justify-center min-h-[80vh] w-full px-4">
@@ -109,7 +114,7 @@ const SignupPage = () => {
 
           <p className="text-sm text-center mt-4 text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-orange-500 hover:underline">
+            <Link href="/auth/login" onClick={handleRouteChange} className="text-orange-500 hover:underline">
               Login
             </Link>
           </p>

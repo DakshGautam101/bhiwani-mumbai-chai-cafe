@@ -4,10 +4,10 @@ import { Item } from '@/app/models/itemsModel'
 
 export async function GET(request) {
 
-try {
+  try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-  const q = searchParams.get('q')?.toLowerCase() || '';
+    const q = searchParams.get('q')?.toLowerCase() || '';
     const items = await Item.find({
       $or: [
         { name: { $regex: q, $options: 'i' } },
@@ -15,12 +15,12 @@ try {
       ]
     });
 
-        return NextResponse.json({ items});
-} catch (error) {
-     console.error(error);
+    return NextResponse.json({ items });
+  } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: 'Search failed' }, { status: 500 });
-}
+  }
 
 
-  
+
 }

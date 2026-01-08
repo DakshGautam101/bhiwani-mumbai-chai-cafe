@@ -1,16 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { CheckCircle, Package, Clock, MapPin, Phone, Mail } from 'lucide-react';
-import Navbar from '@/app/components/navbar';
-import Footer from '@/app/components/footer';
-import UniversalLoader from '@/app/components/UniversalLoader';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Navbar from "@/app/components/navbar";
+import Footer from "@/app/components/footer";
+import { CheckCircle2, AlertCircle } from "lucide-react";
+import Link from "next/link";
 
-const OrderConfirmationPage = () => {
-  const { orderId } = useParams();
+export default function OrderConfirmationPage() {
+  const params = useParams();
+  const orderId = params?.orderId; // Change: Use orderId from params
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,52 +17,77 @@ const OrderConfirmationPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const token = localStorage.getItem('token');
+        // Debug logs
+        console.log("Starting fetch...");
+        console.log("OrderId:", orderId);
+
+        // Get token from localStorage
+        const token = localStorage.getItem("token");
         if (!token) {
-          setError('Please log in to view your order');
-          setLoading(false);
-          return;
+          throw new Error("No authentication token found");
         }
 
+        // Make the API call
         const response = await fetch(`/api/order/${orderId}`, {
+          method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            'Authorization': `Bearer ${token}`,
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          },
+          cache: 'no-store'
         });
 
-        const data = await response.json();
-
-        if (response.ok) {
-          setOrder(data.order);
-        } else {
-          setError(data.error || 'Failed to fetch order details');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const data = await response.json();
+        setOrder(data);
       } catch (err) {
-        setError('Failed to fetch order details');
+        console.error("Fetch error:", err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
+    // Only fetch if we have an orderId
     if (orderId) {
+      console.log("Initiating fetch for orderId:", orderId);
       fetchOrder();
+    } else {
+      console.log("No orderId available");
+      setLoading(false);
     }
-  }, [orderId]);
+  }, [orderId]); // Change: Dependency on orderId instead of id
 
   if (loading) {
-    return <UniversalLoader />;
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-orange-500"></div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   if (error) {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Link href="/">
-              <Button className="bg-orange-500 hover:bg-orange-600">Go Home</Button>
+            <Link
+              href="/menu"
+              className="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors"
+            >
+              Return to Menu
             </Link>
           </div>
         </div>
@@ -76,175 +100,153 @@ const OrderConfirmationPage = () => {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-600 mb-4">Order Not Found</h1>
-            <p className="text-gray-500 mb-4">The order you &apos;re looking for doesn&apos;t exist.</p>
-            <Link href="/">
-              <Button className="bg-orange-500 hover:bg-orange-600">Go Home</Button>
-            </Link>
-          </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-gray-600">No order found.</p>
         </div>
         <Footer />
       </>
     );
   }
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'confirmed': return 'text-blue-600 bg-blue-100';
-      case 'preparing': return 'text-orange-600 bg-orange-100';
-      case 'ready': return 'text-green-600 bg-green-100';
-      case 'delivered': return 'text-green-700 bg-green-200';
-      case 'cancelled': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-100 py-10 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Success Header */}
-          <div className="bg-white rounded-xl shadow-md p-8 mb-8 text-center">
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Order Confirmed!</h1>
-            <p className="text-gray-600 mb-4">Thank you for your order. We&apos;ll prepare it with care.</p>
-            <div className="bg-gray-50 rounded-lg p-4 inline-block">
-              <p className="text-sm text-gray-500">Order ID</p>
-              <p className="text-xl font-mono font-bold text-gray-800">{order.orderId}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Order Details */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <Package className="w-5 h-5 mr-2" />
-                Order Details
-              </h2>
-
-              <div className="space-y-4">
-                {order.items.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center border-b pb-2">
-                    <div>
-                      <p className="font-semibold text-gray-800">{item.name}</p>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity} × ₹{item.price}</p>
-                    </div>
-                    <p className="font-semibold text-gray-800">₹{item.total}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 pt-4 border-t">
-                <div className="flex justify-between text-sm text-gray-600 mb-1">
-                  <span>Subtotal:</span>
-                  <span>₹{order.subtotal}</span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>Delivery:</span>
-                  <span>₹{order.deliveryCharge}</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold text-gray-800">
-                  <span>Total:</span>
-                  <span>₹{order.totalAmount}</span>
-                </div>
-              </div>
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-md p-8">
+            {/* ✅ Success header */}
+            <div className="text-center mb-8">
+              <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                Order Confirmed!
+              </h1>
+              <p className="text-gray-600">
+                Thank you for your order. Your order number is #{orderId}
+              </p>
             </div>
 
-            {/* Order Status & Info */}
             <div className="space-y-6">
-              {/* Status */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <Clock className="w-5 h-5 mr-2" />
-                  Order Status
-                </h2>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  Ordered on {formatDate(order.createdAt)}
-                </p>
-              </div>
-
-              {/* Delivery Info */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <MapPin className="w-5 h-5 mr-2" />
-                  Delivery Information
-                </h2>
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    <span className="font-medium">Method:</span> {order.deliveryMethod === 'delivery' ? 'Home Delivery' : 'Store Pickup'}
-                  </p>
-                  {order.deliveryAddress && (
-                    <p className="text-sm">
-                      <span className="font-medium">Address:</span> {order.deliveryAddress.address}, {order.deliveryAddress.city} - {order.deliveryAddress.zip}
+              {/* ✅ Order Details */}
+              <div className="border-t pt-6">
+                <h2 className="text-xl font-semibold mb-4">Order Details</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-gray-600">Delivery Method</p>
+                    <p className="font-medium">
+                      {order.deliveryMethod === "delivery"
+                        ? "Home Delivery"
+                        : order.deliveryMethod || "N/A"}
                     </p>
-                  )}
-                  <p className="text-sm">
-                    <span className="font-medium">Date:</span> {order.deliveryDate}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Time:</span> {order.deliveryTime}
-                  </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Delivery Date & Time</p>
+                    <p className="font-medium">
+                      {order.deliveryDate} at {order.deliveryTime}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Order Status</p>
+                    <p className="font-medium">{order.status}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Payment Status</p>
+                    <p className="font-medium">{order.paymentStatus}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Contact Info */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <Phone className="w-5 h-5 mr-2" />
-                  Contact Information
-                </h2>
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    <span className="font-medium">Name:</span> {order.contactInfo.firstName} {order.contactInfo.lastName}
-                  </p>
-                  <p className="text-sm flex items-center">
-                    <Phone className="w-4 h-4 mr-1" />
-                    {order.contactInfo.phone}
-                  </p>
-                  <p className="text-sm flex items-center">
-                    <Mail className="w-4 h-4 mr-1" />
-                    {order.contactInfo.email}
+              {/* ✅ Home Delivery Address */}
+              {order.deliveryMethod === "delivery" && order.deliveryAddress && (
+                <div className="border-t pt-6">
+                  <h2 className="text-xl font-semibold mb-4">Delivery Address</h2>
+                  <p className="text-gray-600">
+                    {order.deliveryAddress.address}
+                    <br />
+                    {order.deliveryAddress.city}, {order.deliveryAddress.zip}
                   </p>
                 </div>
+              )}
+
+              {/* ✅ Customer Info */}
+              {order.contactInfo && (
+                <div className="border-t pt-6">
+                  <h2 className="text-xl font-semibold mb-4">Customer Details</h2>
+                  <p className="text-gray-600">
+                    {order.contactInfo.firstName} {order.contactInfo.lastName}
+                    <br />
+                    Phone: {order.contactInfo.phone}
+                    <br />
+                    Email: {order.contactInfo.email}
+                  </p>
+                </div>
+              )}
+
+              {/* ✅ Items Ordered */}
+              {Array.isArray(order.items) && order.items.length > 0 && (
+                <div className="border-t pt-6">
+                  <h2 className="text-xl font-semibold mb-4">Items Ordered</h2>
+                  <div className="space-y-4">
+                    {order.items.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center"
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-gray-500">
+                            Qty: {item.quantity} × ₹{item.price}
+                          </p>
+                        </div>
+                        <p className="font-semibold">
+                          ₹{(item.quantity * item.price).toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ✅ Payment Details */}
+              <div className="border-t pt-6">
+                <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-gray-600">Payment Method</p>
+                    <p className="font-medium capitalize">
+                      {order.paymentMethod}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Payment ID</p>
+                    <p className="font-medium">{order.razorpayPaymentId}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ✅ Total */}
+              <div className="border-t pt-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-xl font-semibold">Total Amount:</span>
+                  <span className="text-2xl font-bold">
+                    ₹{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
+                  </span>
+                </div>
+              </div>
+
+              {/* ✅ CTA */}
+              <div className="flex justify-center pt-6">
+                <Link
+                  href="/menu"
+                  className="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors"
+                >
+                  Continue Shopping
+                </Link>
               </div>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-8 text-center space-x-4">
-            <Link href="/menu">
-              <Button className="bg-orange-500 hover:bg-orange-600">
-                Continue Shopping
-              </Button>
-            </Link>
-            <Link href="/auth/profile">
-              <Button variant="outline">
-                View All Orders
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
       <Footer />
     </>
   );
-};
-
-export default OrderConfirmationPage;
+}

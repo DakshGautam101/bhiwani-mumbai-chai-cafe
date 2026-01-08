@@ -14,7 +14,7 @@ export async function POST(req) {
         status: 401,
         headers: { "Content-Type": "application/json" },
       }
-    );
+    ); 
   }
 
   const token = authHeader.split(" ")[1];

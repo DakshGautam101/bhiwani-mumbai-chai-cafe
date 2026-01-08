@@ -1,54 +1,48 @@
 import { connectDB } from "@/lib/ConnectDB";
 import { Item } from "@/app/models/itemsModel";
 import { Category } from "@/app/models/categoryModel";
+import { NextResponse } from "next/server";
 
 export async function GET(req) {
     try {
         await connectDB();
-        
-        const url = new URL(req.url);
-        const categoryId = url.searchParams.get("categoryId");
+        const { searchParams } = new URL(req.url);
+        const categoryId = searchParams.get('categoryId');
 
         if (!categoryId) {
-            return new Response(JSON.stringify({ error: "categoryId is required" }), { 
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            return NextResponse.json(
+                { error: "Category ID is required" },
+                { status: 400 }
+            );
         }
 
-        // Find the category first to get its name
+        // First verify if category exists
         const category = await Category.findById(categoryId);
         if (!category) {
-            return new Response(JSON.stringify({ error: "Category not found" }), { 
-                status: 404,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            return NextResponse.json(
+                { error: "Category not found" },
+                { status: 404 }
+            );
         }
 
-        // Now find items using the category name
-        const items = await Item.find({ category: category._id });
+        // Find items by category ID
+        const items = await Item.find({ category: categoryId })
+            .populate('category', 'name')
+            .select('name description price image inStock rating');
 
         // Debug logging
-        console.log('Category lookup:', {
+        console.log('Found items:', {
             categoryId,
             categoryName: category.name,
-            itemsFound: items.length
+            itemsCount: items.length
         });
 
-        return new Response(JSON.stringify(items), { 
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-        });
-
+        return NextResponse.json(items);
     } catch (error) {
-        console.error('API Error:', error);
-        return new Response(JSON.stringify({ 
-            error: "Failed to fetch items", 
-            details: error.message,
-            category: category ? category.name : null
-        }), { 
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        console.error('GetCategoryItems API Error:', error);
+        return NextResponse.json(
+            { error: "Failed to fetch items", details: error.message },
+            { status: 500 }
+        );
     }
 }

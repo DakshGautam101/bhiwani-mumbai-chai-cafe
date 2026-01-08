@@ -3,55 +3,93 @@ const requestOptions = {
   headers: {
     "Content-Type": "application/json",
   },
+  cache: 'no-store'
 };
 
 export const getCategories = async () => {
   try {
-    const base_url = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000/api';
+    const response = await fetch('/api/menu/GetCategories', {
+      ...requestOptions,
+      next: { revalidate: 0 }
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch categories: ${errorText}`);
+    }
 
-    const response = await fetch(`${base_url}/menu/GetCategories`, requestOptions);
-    if (!response.ok) throw new Error("Failed to fetch categories");
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
 
-    const categories = await response.json();
-
-    // Get items to calculate count per category
-    const items = await getMenuItems();
-
-    // Append itemsCount manually
-    const enhancedCategories = categories.map((cat) => ({
-      ...cat,
-      itemsCount: items.filter((item) => item.category === cat.name).length,
-    }));
-
-    return enhancedCategories;
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching categories:", error);
     return [];
   }
 };
 
 export const getMenuItems = async () => {
   try {
-    const base_url = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000/api';
-    const response = await fetch(`${base_url}/menu/GetItems`, requestOptions);
-    if (!response.ok) throw new Error("Failed to fetch items");
-    return await response.json();
+    // Use relative URL instead of base URL
+    const response = await fetch('/api/menu/GetItems', {
+      ...requestOptions,
+      next: { revalidate: 0 }
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch items: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching items:", error);
     return [];
   }
 };
 
 export const getMenuData = async () => {
-  const categories = await getCategories();
-  const items = await getMenuItems();
+  try {
+    // Fetch both categories and items concurrently
+    const [categories, items] = await Promise.all([
+      getCategories(),
+      getMenuItems()
+    ]);
 
-  return categories.map((category) => ({
-    ...category,
-    items: items.filter(
-      (item) =>
-        (typeof item.category === "string" && item.category === category._id) ||
-        (typeof item.category === "object" && item.category?._id === category._id)
-    ),
-  }));
+    // Map items to their categories
+    return categories.map(category => ({
+      ...category,
+      items: items.filter(item => 
+        item.category?.name === category.name || 
+        item.category === category._id ||
+        item.category?._id === category._id
+      )
+    }));
+  } catch (error) {
+    console.error("Error building menu data:", error);
+    return [];
+  }
+};
+
+export const getCategoryItems = async (categoryId) => {
+  if (!categoryId) return [];
+
+  try {
+    const response = await fetch(`/api/menu/GetCategoryItems?categoryId=${categoryId}`, {
+      ...requestOptions,
+      next: { revalidate: 0 }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch items: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+
+  } catch (error) {
+    console.error("Error fetching category items:", error);
+    return [];
+  }
 };
